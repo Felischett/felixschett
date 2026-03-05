@@ -6,7 +6,25 @@
 # At the end, the program prints how many times each hand type occurred and the percentage of the total simulations.
 
 import random
-from collections import Counter  # <— nötig für Counter
+from collections import Counter
+import time
+import functools
+
+def timer_decorator(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_zeit = time.perf_counter()
+
+        ergebnis = func(*args, **kwargs)
+
+        end_zeit = time.perf_counter()
+        laufzeit = end_zeit - start_zeit
+        print(f"Laufzeit: {laufzeit:.6f} Sekunden")
+
+        return ergebnis
+
+    return wrapper
+
 
 RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Bube", "Dame", "König", "Ass"]
 RINDEX = {r: i for i, r in enumerate(RANKS)}
@@ -43,7 +61,6 @@ def create_deck():
 
     print(hand)
     return hand
-
 
 def functions(hand: dict):
     rank_count = Counter()
@@ -116,7 +133,7 @@ def functions(hand: dict):
 def statisticUpdate(stat: dict, kombi: str):
     stat[kombi] += 1
 
-
+@timer_decorator
 def main():
     kombis = ["Nichts", "Paar", "Zwei Paare", "Drilling",
               "Straße", "Flush", "Full House", "Vierling"]
@@ -131,6 +148,8 @@ def main():
     for k, v in statistics.items():
         anteil = (v / 100000) * 100
         print(f"{k:12s}: {v:7d} hat einen Anteil von {anteil:6.3f}%")
+
+#main = timer_decorator(main)
 
 if __name__ == "__main__":
     main()
